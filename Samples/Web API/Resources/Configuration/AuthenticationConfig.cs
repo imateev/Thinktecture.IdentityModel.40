@@ -21,8 +21,7 @@ namespace Resources.Configuration
             var config = new AuthenticationConfiguration
             {
                 DefaultAuthenticationScheme = "Basic",
-                EnableSessionToken = true,
-                SetNoRedirectMarker = true
+                EnableSessionToken = true
             };
 
             #region BasicAuthentication
