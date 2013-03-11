@@ -7,7 +7,6 @@ namespace Thinktecture.IdentityModel.Constants
 {
     public static class Internal
     {
-        public const string NoRedirectLabel = "Thinktecture.IdentityModel.NoRedirect";
         public const string TraceSourceName = "Thinktecture.IdentityModel";
     }
 }
