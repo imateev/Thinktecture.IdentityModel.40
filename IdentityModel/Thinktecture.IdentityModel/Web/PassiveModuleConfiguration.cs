@@ -102,10 +102,13 @@ namespace Thinktecture.IdentityModel.Web
                     delegate(object sender, AuthorizationFailedEventArgs e)
                     {
                         var ctx = HttpContext.Current;
-                        var req = new HttpRequestWrapper(ctx.Request);
-                        var isApi = (req.IsAjaxRequest() ||
-                                     ctx.Handler.GetType().FullName == WebApiControllerName);
-                        e.RedirectToIdentityProvider = !isApi;
+                        if (!ctx.User.Identity.IsAuthenticated)
+                        {
+                            var req = new HttpRequestWrapper(ctx.Request);
+                            var isApi = (req.IsAjaxRequest() ||
+                                         ctx.Handler.GetType().FullName == WebApiControllerName);
+                            e.RedirectToIdentityProvider = !isApi;
+                        }
                     };
             }
         }
