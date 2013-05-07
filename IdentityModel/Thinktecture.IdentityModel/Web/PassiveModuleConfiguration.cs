@@ -104,9 +104,11 @@ namespace Thinktecture.IdentityModel.Web
                         var ctx = HttpContext.Current;
                         if (!ctx.User.Identity.IsAuthenticated)
                         {
+                            var handler = ctx.Handler;
                             var req = new HttpRequestWrapper(ctx.Request);
                             var isApi = (req.IsAjaxRequest() ||
-                                         ctx.Handler.GetType().FullName == WebApiControllerName);
+                                         (handler != null && 
+                                          handler.GetType().FullName == WebApiControllerName));
                             e.RedirectToIdentityProvider = !isApi;
                         }
                     };
