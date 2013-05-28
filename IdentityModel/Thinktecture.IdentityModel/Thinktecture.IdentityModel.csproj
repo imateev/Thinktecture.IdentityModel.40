@@ -334,6 +334,10 @@
     <Compile Include="Tokens\IssuerNameRegistry\MetadataBasedIssuerNameRegistry.cs" />
     <Compile Include="Tokens\MachineKeySessionSecurityTokenHandler.cs" />
     <Compile Include="Tokens\MachineKeyTransform.cs" />
+    <Compile Include="Web\Configuration\AppStart.cs" />
+    <Compile Include="Web\Configuration\SecuritySessionSection.cs" />
+    <Compile Include="Web\Configuration\SessionConfiguration.cs" />
+    <Compile Include="Web\Configuration\SessionConfigurationModule.cs" />
     <Compile Include="Web\ITokenCacheRepository.cs" />
     <Compile Include="Web\MachineKeyCookieTransform.cs" />
     <Compile Include="Web\MachineKeySessionSecurityTokenHandler.cs" />
