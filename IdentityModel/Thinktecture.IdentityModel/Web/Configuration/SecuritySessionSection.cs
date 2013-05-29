@@ -47,12 +47,12 @@ namespace Thinktecture.IdentityModel.Web.Configuration
             set { this[_DefaultSessionDuration] = value; }
         }
 
-        private const string _EnablePersistentSessions = "enablePersistentSessions";
-        [ConfigurationProperty(_EnablePersistentSessions, DefaultValue = false)]
-        public bool EnablePersistentSessions
+        private const string _PersistentSessionDuration = "persistentSessionDuration";
+        [ConfigurationProperty(_PersistentSessionDuration, DefaultValue = "00:00:00")]
+        public TimeSpan PersistentSessionDuration
         {
-            get { return (bool)this[_EnablePersistentSessions]; }
-            set { this[_EnablePersistentSessions] = value; }
+            get { return (TimeSpan)this[_PersistentSessionDuration]; }
+            set { this[_PersistentSessionDuration] = value; }
         }
 
         private const string _CacheSessionsOnServer = "cacheSessionsOnServer";

@@ -49,7 +49,11 @@ namespace Thinktecture.IdentityModel.Web.Configuration
                 PassiveSessionConfiguration.ConfigureMackineKeyProtectionForSessionTokens();
             }
 
-            if (this.config.DefaultSessionDuration > TimeSpan.Zero)
+            if (this.config.PersistentSessionDuration > TimeSpan.Zero)
+            {
+                PassiveSessionConfiguration.ConfigureDefaultSessionDuration(this.config.PersistentSessionDuration);
+            }
+            else if (this.config.DefaultSessionDuration > TimeSpan.Zero)
             {
                 PassiveSessionConfiguration.ConfigureDefaultSessionDuration(this.config.DefaultSessionDuration);
             }
@@ -61,7 +65,7 @@ namespace Thinktecture.IdentityModel.Web.Configuration
                 SessionConfigurationModule.OverrideWSFedTokenLifetime = config.OverrideWSFedTokenLifetime;
                 SessionConfigurationModule.SuppressLoginRedirectsForApiCalls = config.SuppressLoginRedirectsForApiCalls;
                 SessionConfigurationModule.SuppressSecurityTokenExceptions = config.SuppressSecurityTokenExceptions;
-                SessionConfigurationModule.EnablePersistentSessions = config.EnablePersistentSessions;
+                SessionConfigurationModule.EnablePersistentSessions = config.PersistentSessionDuration > TimeSpan.Zero;
 
                 DynamicModuleUtility.RegisterModule(typeof(SessionConfigurationModule));
             }
@@ -77,7 +81,7 @@ namespace Thinktecture.IdentityModel.Web.Configuration
                     this.config.OverrideWSFedTokenLifetime ||
                     this.config.SuppressLoginRedirectsForApiCalls ||
                     this.config.SuppressSecurityTokenExceptions ||
-                    this.config.EnablePersistentSessions;
+                    this.config.PersistentSessionDuration > TimeSpan.Zero;
             }
         }
     }
