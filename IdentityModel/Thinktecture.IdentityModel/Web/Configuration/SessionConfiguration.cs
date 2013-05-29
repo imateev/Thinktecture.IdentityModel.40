@@ -13,7 +13,11 @@ namespace Thinktecture.IdentityModel.Web.Configuration
     {
         internal static void Start()
         {
-            new SessionConfiguration(SecuritySessionSection.Instance).Configure();
+            var config = SecuritySessionSection.Instance;
+            if (config != null)
+            {
+                new SessionConfiguration(config).Configure();
+            }
         }
 
         SecuritySessionSection config;
