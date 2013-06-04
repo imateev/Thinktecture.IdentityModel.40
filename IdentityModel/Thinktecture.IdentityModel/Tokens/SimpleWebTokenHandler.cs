@@ -218,7 +218,7 @@ namespace Thinktecture.IdentityModel.Tokens
         private static string CreateUnsignedToken(SimpleWebToken swt)
         {
             var sb = new StringBuilder();
-            CreateClaims(sb);
+            CreateClaims(swt, sb);
 
             sb.AppendFormat("Issuer={0}&", HttpUtility.UrlEncode(swt.Issuer));
             sb.AppendFormat("Audience={0}&", HttpUtility.UrlEncode(swt.AudienceUri.AbsoluteUri));
@@ -289,7 +289,6 @@ namespace Thinktecture.IdentityModel.Tokens
                 throw new SecurityTokenValidationException("No signing key found");
             }
 
-
             // TODO
             // check signature
             if (!swt.VerifySignature(securityKey.GetSymmetricKey()))
@@ -297,19 +296,17 @@ namespace Thinktecture.IdentityModel.Tokens
                 throw new SecurityTokenValidationException("Signature verification of the incoming token failed.");
             }
 
-            
-
             var id = new ClaimsIdentity("SWT");
-
             foreach (var claim in swt.Claims)
             {
-                claim.Value.Split(',').ToList().ForEach(v => id.Claims.Add(new Claim(claim.ClaimType, v, ClaimValueTypes.String, issuerName)));
+                var value  = claim.Value;
+                value.Split(',').ToList().ForEach(v => id.Claims.Add(new Claim(claim.ClaimType, HttpUtility.UrlDecode(v), ClaimValueTypes.String, issuerName)));
             }
 
             return new ClaimsIdentityCollection(new ClaimsIdentity[] { id });
         }
 
-        private static void CreateClaims(SimpleWebToken swt, StringBuilder sb)
+        internal static void CreateClaims(SimpleWebToken swt, StringBuilder sb)
         {
             var claims = new Dictionary<string, List<string>>();
 
@@ -329,10 +326,20 @@ namespace Thinktecture.IdentityModel.Tokens
             foreach (var kv in claims)
             {
                 var values = kv.Value;
-                foreach (var s in values)
+                string s = null;
+
+                foreach (var val in values)
                 {
-                    sb.AppendFormat("{0}={1}&", HttpUtility.UrlEncode(kv.Key), HttpUtility.UrlEncode(s));
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        s = HttpUtility.UrlEncode(val);
+                        continue;
+                    }
+
+                    s += string.Format(",{0}", HttpUtility.UrlEncode(val));
                 }
+
+                sb.AppendFormat("{0}={1}&", HttpUtility.UrlEncode(kv.Key), HttpUtility.UrlEncode(s));
             }
         }
 

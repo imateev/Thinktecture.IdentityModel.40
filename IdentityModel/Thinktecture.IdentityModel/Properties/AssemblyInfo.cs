@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -36,3 +37,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("2.6.2")]
 
 [assembly: CLSCompliant(true)]
+[assembly: InternalsVisibleTo("Thinktecture.IdentityModel.Tests")]
