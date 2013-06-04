@@ -218,17 +218,7 @@ namespace Thinktecture.IdentityModel.Tokens
         private static string CreateUnsignedToken(SimpleWebToken swt)
         {
             var sb = new StringBuilder();
-            var claims = new Dictionary<string, string>();
-
-            foreach (var claim in swt.Claims)
-            {
-                claims.Add(claim.ClaimType, claim.Value);
-            }
-
-            foreach (var kv in claims)
-            {
-                sb.AppendFormat("{0}={1}&", HttpUtility.UrlEncode(kv.Key), HttpUtility.UrlEncode(kv.Value));
-            }
+            CreateClaims(sb);
 
             sb.AppendFormat("Issuer={0}&", HttpUtility.UrlEncode(swt.Issuer));
             sb.AppendFormat("Audience={0}&", HttpUtility.UrlEncode(swt.AudienceUri.AbsoluteUri));
@@ -319,20 +309,30 @@ namespace Thinktecture.IdentityModel.Tokens
             return new ClaimsIdentityCollection(new ClaimsIdentity[] { id });
         }
 
-
-
         private static void CreateClaims(SimpleWebToken swt, StringBuilder sb)
         {
-            var claims = new Dictionary<string, string>();
+            var claims = new Dictionary<string, List<string>>();
 
             foreach (var claim in swt.Claims)
             {
-                claims.Add(claim.ClaimType, claim.Value);
+                if (claims.ContainsKey(claim.ClaimType))
+                {
+                    claims[claim.ClaimType].Add(claim.Value);
+                }
+                else 
+                {
+                    claims.Add(claim.ClaimType, new List<string>());
+                    claims[claim.ClaimType].Add(claim.Value);
+                }
             }
 
             foreach (var kv in claims)
             {
-                sb.AppendFormat("{0}={1}&", HttpUtility.UrlEncode(kv.Key), HttpUtility.UrlEncode(kv.Value));
+                var values = kv.Value;
+                foreach (var s in values)
+                {
+                    sb.AppendFormat("{0}={1}&", HttpUtility.UrlEncode(kv.Key), HttpUtility.UrlEncode(s));
+                }
             }
         }
 
