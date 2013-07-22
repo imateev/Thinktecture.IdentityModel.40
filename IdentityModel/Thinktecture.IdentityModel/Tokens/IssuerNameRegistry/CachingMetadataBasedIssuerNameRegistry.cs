@@ -2,8 +2,10 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Thinktecture.IdentityModel.Diagnostics;
 
 namespace Thinktecture.IdentityModel.Tokens
 {
@@ -84,34 +86,54 @@ namespace Thinktecture.IdentityModel.Tokens
                 bytes = GetMetadataFromSource();
                 this.cache.Save(bytes);
             }
-            else
-            {
-                // check to see if we can eager-reload the cache
-                // if we're more than half-way to expiration, then reload
-                var halfTime = this.cacheDuration/2;
-                var age = cache.Age.TotalDays;
-                if (age > halfTime)
-                {
-                    // reload on background thread
-                    Task.Factory.StartNew(
-                        delegate
-                        {
-                            var data = GetMetadataFromSource();
-                            this.cache.Save(data);
-                        })
-                    .ContinueWith(task =>
-                        {
-                            // don't take down process if this fails 
-                            // if ThrowUnobservedTaskExceptions is enabled
-                            if (task.IsFaulted)
-                            {
-                                var ex = task.Exception;
-                            }
-                        });
-                }
-            }
+           
+            // reload cache from source periodically
+            SetupCacheReloadTimer(); 
             
             return new MemoryStream(bytes);
+        }
+
+        // need to get a rooted ref to timer so it's not GC'd
+        static Timer _cacheReloadTimer;
+
+        private void SetupCacheReloadTimer()
+        {
+            Action loadCache = () =>
+            {
+                try
+                {
+                    var bytes = GetMetadataFromSource();
+                    if (bytes != null)
+                    {
+                        this.cache.Save(bytes);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Tracing.Error("CachingMetadataBasedIssuerNameRegistry", String.Format("metadata polling: {0}", ex.Message));
+                }
+            };
+
+            // this will check every day for an updated metadata document
+            // reload on background thread
+            var timerInterval = (int)TimeSpan.FromDays(1).TotalMilliseconds;
+            var cb = new TimerCallback(state =>
+            {
+                loadCache();
+            });
+            _cacheReloadTimer = new Timer(
+                cb, null,
+                timerInterval,
+                timerInterval);
+
+            // check to see if we can eager-reload the cache
+            // if we're more than half-way to expiration, then reload
+            var halfTime = this.cacheDuration / 2;
+            var age = cache.Age.TotalDays;
+            if (age > halfTime)
+            {
+                Task.Factory.StartNew(loadCache);
+            }
         }
 
         void LoadCustomConfiguration(XmlNodeList nodeList)
