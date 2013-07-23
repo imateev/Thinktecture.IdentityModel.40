@@ -207,5 +207,17 @@ namespace Thinktecture.IdentityModel.Http.Cors
             }
             return this;
         }
+
+        public CorsFluentSettings WithCacheDuration(int duration)
+        {
+            if (duration <= 0) throw new ArgumentException("duration must be greater than zero");
+            
+            this.EnsureAdded();
+            foreach (var item in this.entries)
+            {
+                item.CacheDuration = duration;
+            }
+            return this;
+        }
     }
 }
