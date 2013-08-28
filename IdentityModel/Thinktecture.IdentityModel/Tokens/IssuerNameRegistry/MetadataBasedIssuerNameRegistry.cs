@@ -24,8 +24,9 @@ namespace Thinktecture.IdentityModel.Tokens
         public MetadataBasedIssuerNameRegistry()
         {
         }
+        
         public MetadataBasedIssuerNameRegistry(XmlNodeList nodeList)
-            : this(nodeList, false)
+            : this(nodeList, true)
         {
         }
 

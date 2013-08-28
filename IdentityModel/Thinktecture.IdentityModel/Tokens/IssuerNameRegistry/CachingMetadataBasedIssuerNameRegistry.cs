@@ -25,7 +25,6 @@ namespace Thinktecture.IdentityModel.Tokens
             : base(config, true)
         {
             LoadCustomConfiguration(config);
-            LoadMetadata();
         }
 
         public CachingMetadataBasedIssuerNameRegistry(
