@@ -34,38 +34,6 @@ namespace Thinktecture.IdentityModel.Web
             serializer = new SessionSecurityTokenCookieSerializer();
         }
 
-        static object lastCleanupLock = new object();
-        static DateTime? lastCleanup;
-        const int cleanupIntervalHours = 6;
-        
-        void CleanupOldTokens()
-        {
-            lock(lastCleanupLock)
-            {
-                if (lastCleanup == null || lastCleanup < DateTime.UtcNow.AddHours(-cleanupIntervalHours))
-                {
-                    lastCleanup = DateTime.UtcNow;
-
-                    Task.Factory.StartNew(
-                        delegate
-                        {
-                            // cleanup old tokens
-                            DateTime date = DateTime.UtcNow.AddHours(-cleanupIntervalHours);
-                            this.tokenCacheRepository.RemoveAllBefore(date);
-                        })
-                    .ContinueWith(task =>
-                        {
-                            // don't take down process if this fails 
-                            // if ThrowUnobservedTaskExceptions is enabled
-                            if (task.IsFaulted)
-                            {
-                                var ex = task.Exception;
-                            }
-                        });
-                }
-            }
-        }
-
         byte[] TokenToBytes(SessionSecurityToken token)
         {
             if (token == null) return null;
@@ -104,8 +72,6 @@ namespace Thinktecture.IdentityModel.Web
         {
             if (key == null) throw new ArgumentNullException("key");
 
-            CleanupOldTokens();
-            
             var cacheKey = GetCacheKey(key);
             var item = new TokenCacheItem
             {
@@ -126,8 +92,6 @@ namespace Thinktecture.IdentityModel.Web
         public override bool TryGetEntry(object key, out System.IdentityModel.Tokens.SecurityToken value)
         {
             if (key == null) throw new ArgumentNullException("key");
-
-            CleanupOldTokens();
 
             if (inner.TryGetEntry(key, out value))
             {
@@ -155,8 +119,6 @@ namespace Thinktecture.IdentityModel.Web
 
         public override bool TryRemoveEntry(object key)
         {
-            CleanupOldTokens();
-
             if (key == null) throw new ArgumentNullException("key");
 
             var cacheKey = GetCacheKey(key);
@@ -168,8 +130,6 @@ namespace Thinktecture.IdentityModel.Web
         {
             if (key == null) throw new ArgumentNullException("key");
 
-            CleanupOldTokens();
-            
             var cacheKey = GetCacheKey(key);
             var item = new TokenCacheItem
             {

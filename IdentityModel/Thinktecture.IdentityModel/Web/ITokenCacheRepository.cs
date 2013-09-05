@@ -8,7 +8,6 @@ namespace Thinktecture.IdentityModel.Web
         void AddOrUpdate(TokenCacheItem item);
         TokenCacheItem Get(string key);
         void Remove(string key);
-        void RemoveAllBefore(DateTime date);
     }
 
     public class TokenCacheItem
