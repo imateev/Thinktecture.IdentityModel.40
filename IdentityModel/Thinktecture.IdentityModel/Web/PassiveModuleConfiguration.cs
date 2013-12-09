@@ -102,7 +102,7 @@ namespace Thinktecture.IdentityModel.Web
                     delegate(object sender, AuthorizationFailedEventArgs e)
                     {
                         var ctx = HttpContext.Current;
-                        if (!ctx.User.Identity.IsAuthenticated)
+                        if (!ctx.Request.IsAuthenticated)
                         {
                             var handler = ctx.Handler;
                             var req = new HttpRequestWrapper(ctx.Request);
