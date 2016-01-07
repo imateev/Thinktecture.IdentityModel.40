@@ -32,7 +32,7 @@ namespace Thinktecture.IdentityModel.Tokens
                 case 64:
                     return Algorithms.HmacSha512Signature;
                 default:
-                    throw new InvalidOperationException("Unsupported key lenght");
+                    throw new InvalidOperationException("Unsupported key length");
             }
         }
 
